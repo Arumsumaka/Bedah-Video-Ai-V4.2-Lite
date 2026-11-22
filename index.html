@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Replication Generator V4.2</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--line:#293650;--text:#eef3ff;--muted:#9ba9c3;--accent:#8b7cff;--teal:#39c6b2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#20264b 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.55 system-ui,sans-serif}.wrap{max-width:900px;margin:auto;padding:28px 16px 55px}.hero{margin-bottom:22px}.eyebrow{color:var(--teal);font-size:12px;font-weight:800;letter-spacing:1.6px}.hero h1{font-size:clamp(28px,4vw,40px);line-height:1.15;margin:8px 0}.hero p,.muted,.hint{color:var(--muted)}.card{background:linear-gradient(145deg,#162036,#0f1729);border:1px solid var(--line);border-radius:17px;padding:21px;margin:15px 0;box-shadow:0 14px 35px #0002}.card h2{font-size:18px;margin:0 0 5px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}label{display:block;font-size:13px;color:#c7d2e8;font-weight:700;margin-bottom:7px}input,select{width:100%;background:#0c1426;border:1px solid #34425f;border-radius:10px;color:var(--text);padding:12px;font:inherit;outline:none}input:focus,select:focus{border-color:var(--accent)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:800;font-size:13px;cursor:pointer;color:white;background:#34415d}.btn:hover{filter:brightness(1.15)}.primary{background:linear-gradient(110deg,#7668ef,#9b73ee)}.teal{background:linear-gradient(110deg,#169e93,#28b9a8)}.gold{background:#6d5522;color:#ffe7a5}.btn:disabled{opacity:.4;cursor:not-allowed}.status{font-size:12px;color:var(--teal);min-height:18px;margin-top:9px}.hint{font-size:12px;margin-top:8px}.notice{border:1px solid #65552e;background:#2b2618;color:#f5df9d;padding:12px 14px;border-radius:11px;font-size:13px;margin-top:13px}.prompt{background:#090f1d;border:1px solid #2e3a55;border-radius:11px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto;color:#d4def2;font:12px/1.6 ui-monospace,monospace}.footer{text-align:center;color:#71809b;font-size:12px;margin-top:28px}@media(max-width:650px){.wrap{padding:20px 12px 40px}.grid{grid-template-columns:1fr}.card{padding:16px}.btn{flex:1 1 auto}}
+</style></head>
+<body><main class="wrap">
+<header class="hero"><div class="eyebrow">REFERENCE DNA ENGINE · CLAUDE PERSONAL MODE</div><h1>Video Replication Generator</h1><p>Hasilkan naskah dan storyboard 3D yang selaras, runtut, dan mudah dibaca berdasarkan DNA video referensi.</p></header>
+<section class="card"><h2>Pengaturan Video</h2><p class="muted" style="font-size:13px;margin-top:0">Isi parameter utama, lalu tekan Generate.</p>
+<div class="grid"><div class="full"><label for="judul">Judul / Topik Video</label><input id="judul" placeholder="Contoh: Bagaimana korek gas bekerja?"></div>
+<div><label for="bahasa">Bahasa Voice Over</label><select id="bahasa"><option>Bahasa Indonesia</option><option>English</option><option>Bahasa Melayu</option><option>Español</option><option>Bahasa lainnya</option></select></div>
+<div><label for="durasi">Durasi Video</label><select id="durasi"><option value="15">15 detik</option><option value="30">30 detik</option><option value="60" selected>60 detik</option><option value="90">90 detik</option><option value="120">120 detik</option><option value="custom">Durasi khusus</option></select></div>
+<div id="customWrap" style="display:none"><label for="customDurasi">Durasi khusus (5–1800 detik)</label><input id="customDurasi" type="number" min="5" max="1800" value="60"></div>
+<div><label for="rasio">Rasio Aspek</label><select id="rasio"><option value="9:16">9:16 · Vertikal</option><option value="16:9">16:9 · Landscape</option><option value="1:1">1:1 · Persegi</option><option value="4:5">4:5</option><option value="3:4">3:4</option></select></div></div>
+<div class="actions"><button class="btn primary" id="generate">Generate di Claude</button></div>
+<div class="hint">Setelah Claude terbuka, klik kolom pesan lalu tekan <b>Ctrl + V</b> (Mac: <b>⌘ + V</b>), kemudian tekan Enter. Prompt tidak dapat dimasukkan langsung ke kolom chat Claude dari halaman HTML ini.</div><div class="status" id="status" aria-live="polite"></div>
+<div class="notice">Tool ini tidak memakai API. Claude pribadi pengguna yang menghasilkan naskah dan prompt. Tool tidak menggunakan API. Pengguna tetap mengirim prompt dengan menekan Enter.</div>
+</section>
+<section class="card"><h2>Prompt yang Disiapkan</h2><p class="muted" style="font-size:13px;margin-top:0">Prompt akan disalin otomatis saat Generate ditekan. Jika clipboard diblokir browser, gunakan tombol Salin Prompt di bawah.</p><div class="prompt" id="preview">Prompt akan muncul di sini setelah Anda mengisi pengaturan dan menekan Generate.</div><div class="actions"><button class="btn teal" id="copyPrompt" disabled>Salin Prompt</button><button class="btn" id="openChat" disabled>Buka Claude</button><button class="btn gold" id="copyNext" disabled>Salin Perintah LANJUT</button></div><div class="status" id="status2"></div></section>
+<section class="card"><h2>Master DNA Referensi yang Dikunci</h2><ul class="muted" style="font-size:13px;padding-left:20px"><li>Animasi 3D stylized bergaya visual game/CGI edukasi, bukan photorealistic dan bukan 2D.</li><li>Model dan lingkungan 3D sederhana, bentuk mudah dibaca, warna cerah dan natural, langit biru, awan putih, vegetasi hijau, pencahayaan siang yang terang.</li><li>Campuran wide/environment shot, medium shot dengan karakter 3D bila relevan, close-up aksi, aerial/oblique view, dan cutaway teknis sesuai topik.</li><li>Narasi conversational, kalimat mudah dipahami, penjelasan bertahap, sebab-akibat, dan transisi lisan natural.</li><li>Topik baru mengganti objek dan lingkungan, tetapi tidak mengganti gaya visual, bahasa kamera, atau pola penyampaian referensi.</li></ul></section><section class="card"><h2>Format Hasil yang Diminta</h2><p class="muted" style="font-size:13px;margin-top:0">Hasil Claude diarahkan agar ringkas, faktual, dan konsisten. Paket SEO YouTube baru muncul setelah scene terakhir, dalam blok siap salin.</p><ul class="muted" style="font-size:13px;padding-left:20px"><li>Naskah VO lengkap dari pembukaan sampai penutup.</li><li>Scene 1: VO + gambar START FRAME + prompt video. Scene 2 dan seterusnya: VO + gambar END FRAME + prompt video; START FRAME diambil dari frame terakhir video scene sebelumnya.</li><li>Jika masih ada sisa naskah, berhenti setelah Scene 6 dan tunggu perintah LANJUT.</li><li>Scene berikutnya meneruskan nomor, timestamp, cerita, dan kontinuitas visual tanpa mengulang scene sebelumnya.</li></ul></section>
+<div class="footer">Video Replication Generator V4.2 · Standalone HTML · Claude Personal · Tanpa API</div></main>
+<script>
+const $=id=>document.getElementById(id);let currentPrompt='';
+async function copyTextRobust(text){
+  // Modern method (works on HTTPS/localhost when browser permission allows it).
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return {ok:true,method:'clipboard'};
+    }
+  } catch(e) {}
+  // Legacy fallback for browsers/hosting where Clipboard API is unavailable.
+  let area;
+  try {
+    area=document.createElement('textarea');
+    area.value=text;
+    area.setAttribute('readonly','');
+    area.style.position='fixed'; area.style.top='0'; area.style.left='-9999px';
+    area.style.opacity='0';
+    document.body.appendChild(area);
+    area.focus(); area.select(); area.setSelectionRange(0,area.value.length);
+    const ok=document.execCommand('copy');
+    area.remove();
+    if(ok) return {ok:true,method:'legacy'};
+  } catch(e) { if(area) area.remove(); }
+  return {ok:false,method:'manual'};
+}
+function selectPromptForManualCopy(){
+  const preview=$('preview');
+  const range=document.createRange(); range.selectNodeContents(preview);
+  const selection=window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+  preview.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function getSettings(){return{title:$('judul').value.trim(),language:$('bahasa').value,duration:$('durasi').value==='custom'?Number($('customDurasi').value):Number($('durasi').value),ratio:$('rasio').value}}
+function buildPrompt(s){return `Bertindaklah sebagai analis video referensi, penulis naskah edukasi, sutradara visual, storyboard artist, dan prompt engineer video 3D. Tugasmu adalah MEREPLIKASI DNA VIDEO REFERENSI, bukan membuat gaya baru berdasarkan selera sendiri.
+
+PROYEK BARU
+Judul/topik: ${s.title}
+Bahasa VO: ${s.language}
+Durasi total: ${s.duration} detik
+Rasio: ${s.ratio}
+
+MASTER DNA VIDEO REFERENSI — ATURAN UTAMA, JANGAN DIUBAH
+DNA berikut diambil dari video referensi How Come yang diberikan pengguna. Terapkan secara konsisten pada seluruh scene. Isi/topik boleh berbeda, tetapi identitas visual dan cara penyampaian harus tetap terasa berasal dari video referensi yang sama.
+
+A. DNA GAYA VISUAL
+- Gunakan STYLIZED 3D EDUCATIONAL ANIMATION dengan tampilan seperti visualisasi 3D game-engine/CGI edukasi. Ini adalah 3D yang sederhana, bersih, mudah dibaca, dan sedikit low-poly; BUKAN photorealistic, BUKAN film CGI realistis yang sangat detail, dan BUKAN 2D.
+- Bentuk objek, bangunan, kendaraan, mesin, karakter, pepohonan, tanah, dan lanskap harus benar-benar memiliki volume dan kedalaman 3D. Geometri cenderung sederhana dan tegas, permukaan relatif bersih, detail secukupnya agar objek mudah dikenali.
+- Karakter manusia bila relevan: karakter 3D stylized dengan proporsi sederhana, wajah tidak terlalu detail, pakaian dan aksesori mudah dikenali. Jangan memaksakan karakter manusia jika topik lebih tepat dijelaskan lewat objek atau lingkungan.
+- Lingkungan: ruang terbuka dan lanskap 3D yang jelas; gunakan langit biru cerah, awan putih, vegetasi hijau, tanah/batuan/air dengan warna natural dan saturasi cukup kuat ketika sesuai konteks. Untuk interior atau topik berbeda, adaptasikan palet secara logis tanpa mengubah gaya 3D stylized referensi.
+- Pencahayaan terang seperti siang hari, bayangan terlihat tetapi tidak dramatis berlebihan. Warna bersih, kontras cukup, mudah dibaca di layar ponsel.
+- Material tampak seperti material 3D stylized yang sederhana dan konsisten. Hindari tekstur mikro hiper-realistis, noise, grain film, lensa anamorphic, dramatic teal-orange grading, atau tampilan live-action.
+- DILARANG: 2D animation, vector illustration, flat infographic, anime, komik, sketsa, photorealistic live-action, hyper-realistic cinematic CGI, dark moody film look, atau gaya visual yang tidak sesuai referensi.
+
+B. DNA KOMPOSISI DAN KAMERA
+- Referensi menggunakan variasi shot yang fungsional dan mudah dipahami: wide shot untuk memperlihatkan lokasi/skala, medium shot untuk karakter atau objek utama, close-up untuk aksi/komponen, aerial atau high-angle oblique untuk melihat tata letak area, dan cutaway/section view saat menjelaskan bagian dalam.
+- Komposisi cenderung jelas, objek utama mudah dikenali, lingkungan tetap terlihat sebagai konteks, dan kamera tidak terlalu banyak bergerak tanpa tujuan.
+- Gunakan sudut pandang eye-level untuk karakter/objek, wide establishing untuk lokasi, high-angle/aerial untuk hubungan antarbagian, dan close-up saat detail proses perlu diperlihatkan.
+- Gerakan kamera sederhana dan terbaca: slow push-in, pull-back, pan, tilt, tracking, atau crane/drone-like movement hanya jika membantu penjelasan. Hindari gerakan kamera yang terlalu cepat, berputar tanpa alasan, handheld shake, whip-pan, dan perpindahan sudut mendadak.
+- Variasi shot harus mengikuti informasi VO, bukan dibuat acak. Jangan membuat semua scene close-up atau semua scene wide.
+
+C. DNA STORYTELLING DAN POLA VISUAL
+- Mulai dengan hook rasa ingin tahu atau situasi yang membuat penonton bertanya. Lanjutkan dengan memperkenalkan konteks, menunjukkan proses secara bertahap, menjelaskan sebab-akibat, memperlihatkan hasil/dampak, lalu menutup dengan jawaban yang memuaskan.
+- Visual sering memperlihatkan lokasi atau objek dalam konteks luas terlebih dahulu, kemudian mendekat ke bagian/aksi yang sedang dijelaskan, lalu kembali ke tampilan yang membantu penonton memahami hasil atau skala.
+- Bila VO menyebut tindakan, tampilkan tindakan itu. Bila VO menyebut lokasi, tampilkan lokasi tersebut. Bila VO menjelaskan mekanisme internal, tunjukkan interior/cutaway yang relevan. Jangan mengganti penjelasan konkret dengan visual dekoratif atau simbol abstrak.
+- Buat setiap scene sebagai satu tahap penjelasan yang memiliki fungsi jelas dalam cerita. Jangan mengulang shot atau informasi yang sama hanya untuk memenuhi jumlah scene.
+- Narasi dan visual harus saling sinkron: setiap kalimat VO mempunyai bukti visual yang terlihat pada saat kalimat itu diucapkan.
+- SEBELUM menulis prompt, buat perencanaan internal untuk setiap scene: (1) inti informasi VO, (2) objek/bagian yang sedang dibahas, (3) aksi yang harus terlihat, (4) komposisi kamera, dan (5) hubungan visual ke scene berikutnya. Jangan tampilkan tabel perencanaan ini di hasil akhir.
+- Satu scene hanya boleh membawa SATU gagasan utama dan satu aksi visual utama. Hindari memasukkan beberapa mekanisme atau lokasi berbeda ke dalam satu scene.
+- Cocokkan visual dengan kata benda dan kata kerja yang benar-benar disebut VO. Contoh: jika VO menyebut gas keluar dari katup, tampilkan gas keluar dari katup; jika VO menyebut roda pemantik berputar, tampilkan roda itu berputar. Jangan mengganti aksi spesifik dengan shot dekoratif.
+- Urutan visual wajib mengikuti urutan penjelasan VO. Jangan menampilkan hasil sebelum penyebabnya dijelaskan, jangan melompat ke komponen yang belum diperkenalkan, dan jangan mengulang visual yang sama jika VO sudah berpindah ke tahap berikutnya.
+- Jika satu kalimat VO menjelaskan proses bertahap, pecah ke scene berbeda bila perlu. Jika satu kalimat hanya menjelaskan satu fakta sederhana, jangan membuat scene tambahan yang tidak diperlukan.
+- Tentukan durasi scene berdasarkan banyaknya informasi dan kompleksitas aksi, bukan membagi durasi total secara rata secara paksa.
+- Setiap prompt gambar harus menggambarkan keadaan visual yang tepat pada SATU titik waktu (keyframe), bukan mencoba menceritakan seluruh proses dalam satu gambar.
+- Video prompt harus menjelaskan perubahan dari kondisi awal ke kondisi akhir secara konkret: posisi awal, aksi berurutan, arah gerak, gerakan kamera, dan pose/komposisi akhir. Jangan menambahkan aksi baru yang tidak disebut atau tidak dibutuhkan oleh VO.
+
+D. DNA VO / GAYA BAHASA
+- Gunakan gaya edukasi conversational yang ramah, lugas, dan terasa seperti seseorang sedang menjelaskan sesuatu kepada penonton.
+- Kalimat relatif singkat dan mudah diikuti. Bangun penjelasan secara bertahap dengan transisi lisan yang natural seperti “nah”, “tapi”, “terus”, “jadi”, atau padanan yang wajar dalam bahasa pilihan. Jangan memaksakan kata-kata tersebut di setiap kalimat.
+- Hindari bahasa akademis kaku, pembukaan formal, daftar fakta yang terasa seperti buku pelajaran, dan kalimat bertele-tele.
+- Pertahankan alur: hook → konteks → proses/penyebab → detail penting → hasil/dampak → penutup. Gunakan analogi hanya bila membantu pemahaman dan tidak mengubah fakta.
+- Jangan menyalin kalimat VO asli video referensi. Replikasi pola penyampaiannya, bukan isi atau kalimat spesifiknya.
+
+E. ADAPTASI TOPIK TANPA KEHILANGAN DNA
+- Jangan menyalin bendungan, pekerja konstruksi, alat berat, sungai, atau objek khusus lain dari video referensi jika tidak relevan dengan topik baru.
+- Jika topik baru tentang korek gas, tampilkan korek gas dan mekanisme pemantiknya. Jika tentang stop kontak, tampilkan komponen dalam stop kontak. Jika tentang mesin kendaraan, tampilkan bagian mesin dan cara kerjanya. Objek berubah mengikuti topik, tetapi gaya 3D stylized, palet, komposisi, bahasa kamera, dan pola penjelasan tetap mengikuti referensi.
+- Jangan mengarang mekanisme teknis. Visual harus sesuai penjelasan yang benar dan spesifik pada topik.
+- Jangan memaksakan karakter manusia pada setiap scene. Gunakan karakter hanya bila membantu storytelling atau skala.
+
+F. AKURASI FAKTA — DILARANG MENGARANG
+- Semua isi edukasi harus sesuai fakta nyata dan prinsip teknis/ilmiah yang dapat dipertanggungjawabkan. Jangan mengutamakan cerita dramatis jika bertentangan dengan fakta.
+- Sebelum menulis naskah, periksa kebenaran topik: cara kerja, nama komponen, urutan proses, hubungan sebab-akibat, angka, satuan, bahan, dan istilah teknis.
+- Jika fitur pencarian web/sumber tersedia, lakukan verifikasi menggunakan sumber primer atau tepercaya seperti dokumentasi produsen, lembaga pemerintah, universitas, jurnal ilmiah, standar teknis, atau referensi pendidikan yang kredibel. Utamakan lebih dari satu sumber untuk klaim teknis penting.
+- Jangan pernah membuat-buat sumber, kutipan, URL, hasil pengujian, angka, spesifikasi, atau fakta. Jangan menulis seolah-olah sudah melakukan riset jika tidak benar-benar melakukannya.
+- Jika pencarian/sumber tidak tersedia, gunakan hanya pengetahuan yang mapan dan umum. Untuk detail yang tidak dapat dipastikan, jangan menebak: hilangkan detail tersebut atau jelaskan secara singkat bahwa detailnya bervariasi/belum dapat dipastikan.
+- Bedakan fakta yang terverifikasi dari penyederhanaan untuk edukasi. Penyederhanaan boleh, tetapi tidak boleh mengubah mekanisme atau menimbulkan kesimpulan yang salah.
+- Jangan menyamakan contoh/ilustrasi dengan bentuk universal. Jika desain komponen berbeda antar model/produk, jelaskan secara umum dan hindari mengklaim satu desain berlaku untuk semua.
+- Visual wajib mengikuti fakta: jangan menggambar komponen fiktif, alur mekanisme yang salah, percikan/reaksi yang tidak terjadi, atau bagian internal yang hanya ditebak. Jika bentuk internal tidak diketahui, gunakan visual konseptual sederhana yang tidak mengklaim detail konstruksi spesifik.
+- Jangan menampilkan angka, label, diagram, atau tulisan dalam gambar/video kecuali benar-benar diperlukan dan datanya sudah terverifikasi. Secara default, visual tanpa teks, subtitle, logo, atau watermark.
+- Jika ada ketidakpastian yang memengaruhi inti penjelasan, sampaikan secara transparan sebelum storyboard; jangan menutupinya dengan karangan.
+
+G. KONSISTENSI VISUAL DAN FRAME
+- Pertahankan desain objek, bentuk, skala, warna, material, lingkungan, pencahayaan, arah gerak, dan screen direction antarscene.
+- Gunakan sumbu kamera dan posisi ruang yang konsisten. Jika perlu pindah lokasi atau masuk ke bagian dalam objek, tunjukkan transisi yang masuk akal dan visualisasikan perpindahan tersebut.
+- Scene 1 menggunakan gambar hasil IMAGE PROMPT sebagai START FRAME.
+- Scene 2 dan seterusnya: START FRAME diambil dari frame terakhir video scene sebelumnya. IMAGE PROMPT scene saat ini menghasilkan END FRAME. Jangan membuat gambar Start Frame tambahan untuk scene lanjutan.
+- Gerakan video harus menghubungkan kondisi Start Frame ke End Frame secara logis dan searah. Hindari perubahan posisi objek, arah gerak, skala, atau kamera yang tidak dapat dijelaskan.
+- Buat kesinambungan berdasarkan cerita, bukan hanya kemiripan gambar. Objek yang diperlihatkan harus merupakan objek yang sama dan berada pada tahap proses yang benar.
+- Scene baru sebaiknya dimulai dari komposisi akhir scene sebelumnya, lalu kamera/objek bergerak secara wajar menuju fokus informasi berikutnya. Bila berpindah dari tampilan luar ke bagian dalam, tunjukkan gerakan mendekat, membuka, menembus/cutaway yang masuk akal; jangan tiba-tiba berpindah ke interior tanpa transisi.
+- Jaga identitas objek tetap: bentuk, warna, material, skala relatif, orientasi, dan detail khas tidak berubah antar scene. Jangan mendesain ulang objek pada setiap gambar.
+
+BAGIAN A — NASKAH VO LENGKAP
+1. Tulis naskah VO lengkap dari hook sampai penutup dalam ${s.language}.
+2. Durasi total harus mendekati ${s.duration} detik dengan tempo bicara conversational dan natural.
+3. Naskah runtut: hook, konteks, penjelasan bertahap, sebab-akibat, dan penutup.
+4. Jangan menulis prompt gambar/video pada bagian ini.
+
+BAGIAN B — STORYBOARD SCENE 1 SAMPAI 6
+1. Setelah naskah lengkap, langsung buat storyboard dari naskah yang sama. Jangan meminta persetujuan tambahan.
+2. Maksimal 6 scene pada jawaban pertama.
+3. VO tiap scene wajib berupa potongan VERBATIM dari naskah Bagian A. Jangan mengubah, meringkas, menambah, menghapus, atau memparafrase kata. Gabungan VO semua scene harus sama dengan naskah lengkap.
+4. Timestamp berurutan mulai 00:00, tanpa celah atau tumpang tindih, dan total durasi sesuai ${s.duration} detik.
+5. Setiap scene wajib berisi VO PERSIS, satu IMAGE PROMPT, dan satu VIDEO PROMPT.
+6. SINKRONISASI WAJIB: sebelum menulis setiap scene, pastikan isi VO scene tersebut diterjemahkan menjadi objek, lokasi, dan aksi yang benar-benar terlihat. Setiap prompt harus menjawab: “Apa yang penonton lihat tepat saat VO ini terdengar?” Jawab dengan visual konkret, bukan suasana umum.
+7. Jangan menambahkan objek, karakter, lokasi, atau aksi yang tidak relevan dengan kalimat VO. Jangan tampilkan komponen yang belum disebut/diterangkan kecuali diperlukan untuk orientasi konteks.
+8. Jika VO menjelaskan urutan sebab-akibat, visual juga harus menunjukkan urutan yang sama. Gunakan gerakan berkelanjutan untuk menghubungkan tahap-tahap proses.
+9. Jaga satu fokus utama per scene. Komposisi harus bersih, objek penting mudah dikenali, latar tidak ramai, dan detail tambahan tidak mengalihkan perhatian.
+10. Scene 1: IMAGE PROMPT berfungsi sebagai START FRAME. Gambarkan kondisi pembuka scene secara jelas dalam gaya MASTER DNA referensi.
+11. Scene 2 dan seterusnya: IMAGE PROMPT berfungsi sebagai END FRAME scene tersebut. START FRAME-nya adalah frame terakhir video scene sebelumnya. Jangan membuat prompt atau gambar Start Frame tambahan.
+12. VIDEO PROMPT menjelaskan satu rangkaian gerakan yang menyambungkan Start Frame ke End Frame. Untuk Scene 1, jelaskan gerakan dari Start Frame hingga akhir video yang komposisinya mudah disambung ke Scene 2. Untuk scene selanjutnya, gerakan harus dimulai dari frame terakhir video sebelumnya dan berakhir tepat pada komposisi End Frame yang disediakan.
+13. Setiap IMAGE PROMPT wajib secara eksplisit menyebut gaya visual referensi: stylized 3D educational animation, clean game-engine-like 3D render, simple readable geometry, bright natural lighting, clear saturated natural colors, dan komposisi edukatif yang relevan. Sesuaikan detailnya dengan topik, jangan sekadar menempelkan kata kunci.
+14. VIDEO PROMPT wajib menjelaskan aksi utama, gerakan objek/komponen, gerakan kamera sederhana, arah gerak, dan kondisi akhir. Hindari rangkaian shot yang tidak perlu atau perubahan sudut kamera mendadak.
+15. Jangan membuat visual generik. Cocokkan setiap shot dengan makna konkret VO. Bila VO membahas bagian dalam atau mekanisme, tunjukkan bagian dalam/mekanisme yang tepat.
+16. Prompt gambar dan video ditulis dalam bahasa Inggris. Jangan menghasilkan gambar/video secara langsung; hanya teks prompt.
+17. Jangan menampilkan bagian/label “MAKNA VISUAL”.
+18. Setiap IMAGE PROMPT dan VIDEO PROMPT wajib berada dalam fenced code block TERPISAH agar masing-masing dapat disalin sendiri.
+19. Scene 1 hanya memiliki IMAGE PROMPT — START FRAME dan VIDEO PROMPT. Scene 2 dan seterusnya memiliki START FRAME SOURCE, IMAGE PROMPT — END FRAME, dan VIDEO PROMPT.
+20. Jika seluruh naskah habis sebelum enam scene, buat hanya scene yang diperlukan dan tulis SELESAI. Jika masih ada VO setelah Scene 6, berhenti tepat setelah Scene 6 dan tulis: “KELOMPOK 1 SELESAI — ketik LANJUT untuk Scene 7–12.”
+21. Jangan membuat scene tanpa bagian VO sumber.
+22. Paket SEO YouTube hanya dibuat SETELAH SELURUH SCENE selesai. Jika masih ada scene lanjutan, jangan tampilkan paket SEO pada kelompok awal; tunggu sampai kelompok terakhir selesai setelah perintah LANJUT.
+
+FORMAT OUTPUT — RINGKAS, RAPI, DAN KONSISTEN
+Gunakan heading yang jelas, jarak antarbagian, dan format yang sama untuk semua scene. Hindari paragraf pengantar, catatan berulang, tabel lebar, penjelasan proses berpikir, dan kalimat dekoratif. Jangan mengulang aturan prompt dalam hasil.
+Urutan hasil hanya:
+1. NASKAH VO LENGKAP (teks bersih dalam paragraf pendek).
+2. SCENE 1, SCENE 2, dan seterusnya. Untuk setiap scene tampilkan hanya:
+   - Timestamp dan durasi dalam satu baris.
+   - VO PERSIS (teks verbatim, maksimal beberapa kalimat yang saling berhubungan).
+   - IMAGE PROMPT (satu code block).
+   - VIDEO PROMPT (satu code block).
+   - START FRAME SOURCE hanya untuk Scene 2 dan seterusnya.
+Judul scene harus pendek dan menjelaskan tahap cerita. Jangan menampilkan label tambahan seperti “MAKNA VISUAL”, “ANALISIS”, “CATATAN SUTRADARA”, atau checklist.
+Pastikan setiap scene mudah dipindai secara visual: satu blok scene tidak boleh mencampur isi scene lain.
+
+SETELAH SCENE TERAKHIR SAJA — PAKET SEO YOUTUBE
+Bila dan hanya bila seluruh naskah serta seluruh scene sudah selesai, tambahkan bagian terakhir berjudul “PAKET SEO YOUTUBE — SIAP SALIN”. Buat metadata yang benar-benar relevan dengan isi video, bukan template generik atau keyword yang tidak dibahas.
+Sertakan dalam satu fenced code block agar mudah disalin sekaligus:
+- 3 opsi judul YouTube yang menarik, akurat, natural, dan memuat kata kunci utama; tandai satu sebagai rekomendasi.
+- Deskripsi YouTube lengkap: 2 baris pembuka yang kuat, ringkasan faktual isi video, kata kunci terkait yang masuk secara natural, dan ajakan komentar/subscribe yang wajar. Jangan mengarang nama channel, tautan, sponsor, atau klaim.
+- Chapters/timestamp yang mengikuti waktu scene sebenarnya dan isi yang benar-benar dibahas. Jangan membuat timestamp atau bab yang tidak sesuai.
+- Tags relevan, dipisahkan koma, tanpa pengulangan dan tanpa keyword stuffing. Jaga total tags tetap ringkas dan maksimal sekitar 500 karakter.
+- 3–5 hashtag paling relevan.
+- Satu komentar pin yang mengundang diskusi sesuai topik.
+Di luar code block tersebut, berikan satu prompt thumbnail berbahasa Inggris dalam fenced code block terpisah. Thumbnail harus memakai DNA visual 3D referensi, menampilkan objek utama yang benar-benar dibahas, komposisi jelas, tanpa tulisan/logo/watermark. Jika teks thumbnail disarankan, tulis 2–4 kata secara terpisah di luar prompt gambar.
+Jangan mengklaim video membahas sesuatu yang tidak ada dalam VO/scene. Jangan memasukkan keyword populer yang tidak relevan. Judul, deskripsi, tags, hashtag, chapters, dan thumbnail harus konsisten satu sama lain.
+Jika seluruh scene selesai dalam jawaban pertama, tampilkan paket SEO di akhir jawaban pertama. Jika scene berlanjut dengan LANJUT, tampilkan paket SEO hanya pada jawaban yang menyelesaikan scene terakhir.
+
+Untuk SCENE 1:
+IMAGE PROMPT — START FRAME (ENGLISH):
+\`\`\`text
+[prompt gambar]
+\`\`\`
+VIDEO PROMPT (ENGLISH):
+\`\`\`text
+[prompt video]
+\`\`\`
+
+Untuk SCENE 2 dan seterusnya:
+START FRAME SOURCE: Use the exact final frame extracted from the immediately preceding scene video as this scene's START FRAME in Flow AI. Do not generate a new start-frame image.
+IMAGE PROMPT — END FRAME (ENGLISH):
+\`\`\`text
+[prompt gambar]
+\`\`\`
+VIDEO PROMPT (ENGLISH):
+\`\`\`text
+[prompt video]
+\`\`\`
+
+Mulai sekarang. Tampilkan NASKAH VO LENGKAP, lalu langsung SCENE 1–6.`}
+function validate(){const s=getSettings();if(!s.title){alert('Isi judul/topik video terlebih dahulu.');$('judul').focus();return null}if(!Number.isFinite(s.duration)||s.duration<5||s.duration>1800){alert('Durasi harus 5–1800 detik.');return null}return s}
+$('durasi').addEventListener('change',()=>$('customWrap').style.display=$('durasi').value==='custom'?'block':'none');
+$('generate').addEventListener('click',async()=>{const s=validate();if(!s)return;currentPrompt=buildPrompt(s);$('preview').textContent=currentPrompt;$('copyPrompt').disabled=$('openChat').disabled=$('copyNext').disabled=false;
+// Buka tab Claude secara sinkron saat klik agar tidak dianggap popup tanpa izin.
+const claudeTab=window.open('https://claude.ai/new','_blank');
+const copyResult=await copyTextRobust(currentPrompt);const copied=copyResult.ok;
+$('status').textContent=(claudeTab?'Claude sudah dibuka. ':'Tab Claude diblokir browser; klik Buka Claude. ')+(copied?'Prompt berhasil disalin. Pindah ke tab Claude, klik kolom pesan, tekan Ctrl + V (Mac: ⌘ + V), lalu Enter.':'Penyalinan otomatis diblokir. Klik Salin Prompt sekali lagi; jika masih gagal, teks prompt akan dipilih agar bisa disalin dengan Ctrl + C.');
+$('status2').textContent=copied?'Prompt berhasil disalin'+(copyResult.method==='legacy'?' (metode kompatibilitas).':'.'):'Clipboard dibatasi browser. Coba tombol Salin Prompt; jika gagal, teks akan dipilih otomatis.';});
+$('copyPrompt').addEventListener('click',async()=>{if(!currentPrompt){$('status2').textContent='Tekan Generate terlebih dahulu.';return}const result=await copyTextRobust(currentPrompt);if(result.ok){$('status2').textContent='Prompt berhasil disalin. Sekarang tempel di Claude dengan Ctrl + V.'}else{selectPromptForManualCopy();$('status2').textContent='Browser menolak penyalinan otomatis. Teks prompt sudah dipilih; tekan Ctrl + C (Mac: ⌘ + C), lalu tempel di Claude.'}});
+$('openChat').addEventListener('click',()=>{const w=window.open('https://claude.ai/new','_blank');$('status2').textContent=w?'Claude dibuka di tab baru. Tempel prompt dengan Ctrl + V.':'Popup diblokir. Izinkan popup untuk halaman tool ini.';});
+$('copyNext').addEventListener('click',async()=>{const result=await copyTextRobust('LANJUT');if(result.ok){$('status2').textContent='Perintah LANJUT berhasil disalin. Tempel di percakapan Claude yang sama.'}else{$('status2').textContent='Penyalinan otomatis diblokir. Ketik LANJUT secara manual di percakapan Claude yang sama.'}});
+</script></body></html>
